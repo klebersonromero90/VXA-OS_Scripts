@@ -13,7 +13,7 @@ $imported ||= {}
 $imported[:Zeus_Fullscreen] = __FILE__
 class << Graphics
 	#---------------------------------------------#
-  Gdi32    = DL.dlopen('gdi32')
+ 	Gdi32    = DL.dlopen('gdi32')
 	User32   = DL.dlopen('user32')
 	Kernel32 = DL.dlopen('kernel32')
 	#---------------------------------------------#
@@ -45,20 +45,17 @@ class << Graphics
 	GetPrivateProfileString   = DL::CFunc.new( Kernel32['GetPrivateProfileString'  ], DL::TYPE_LONG)
 	WritePrivateProfileString = DL::CFunc.new( Kernel32['WritePrivateProfileString'], DL::TYPE_LONG)
 	#---------------------------------------------#
-  unless method_defined?(:zeus_fullscreen_update)
-		HWND     = FindWindow.call([
-				DL::CPtr["RGSS Player"].to_i,
-				0
-		])
-    BackHWND = CreateWindowEx.call([
+  	unless method_defined?(:zeus_fullscreen_update)
+	HWND     = FindWindow.call([DL::CPtr["RGSS Player"].to_i,0])
+    	BackHWND = CreateWindowEx.call([
 				0x08000008,
 				DL::CPtr['Static'].to_i,
 				DL::CPtr[''].to_i,
 				0x80000000,
 			  0,0,0,0,0,0,0,0		
 		])
-		alias zeus_fullscreen_resize_screen resize_screen
-    alias zeus_fullscreen_update        update
+	alias zeus_fullscreen_resize_screen resize_screen
+    	alias zeus_fullscreen_update        update
   end
 private
   def initialize_fullscreen_rects
@@ -88,14 +85,14 @@ private
   def show_borders() SetWindowLong.call([HWND, -16, 0x14CA0000]) end
   def hide_back()    ShowWindow.call([BackHWND, 0])              end
   
-	def show_back
+  def show_back
     ShowWindow.call([BackHWND, 3])
     UpdateWindow.call([BackHWND])
     dc    = GetDC.call([BackHWND])
     rect  = [0, 0, @fullscreen_rect.width, @fullscreen_rect.height].pack('l4')
     brush = CreateSolidBrush.call([0])
-		FillRect.call([dc,DL::CPtr[rect].to_i,brush])
-		ReleaseDC.call([BackHWND, dc])
+    FillRect.call([dc,DL::CPtr[rect].to_i,brush])
+    ReleaseDC.call([BackHWND, dc])
     DeleteObject.call([brush])
   end
 #|||||||||||||||||||||||||||||||||||||||||||#	
@@ -123,20 +120,20 @@ public
     filename = './Game.ini'
     get_option = Proc.new do |key, default_value|
       l = GetPrivateProfileString.call([
-					DL::CPtr[section].to_i,
-					DL::CPtr[key].to_i,
-					DL::CPtr[default_value].to_i,
-					DL::CPtr[buffer].to_i,
-					buffer.size,
-					DL::CPtr[filename].to_i
-			])
-			buffer[0, l]
+	DL::CPtr[section].to_i,
+	DL::CPtr[key].to_i,
+	DL::CPtr[default_value].to_i,
+	DL::CPtr[buffer].to_i,
+	buffer.size,
+	DL::CPtr[filename].to_i
+	])
+	buffer[0, l]
     end
-		#_______Se_nao_haver_configuracao_coloca_a_padrão________________#
+    #_______Se_nao_haver_configuracao_coloca_a_padrão________________#
     @fullscreen       = get_option.call('Fullscreen'     , '0') == '1'
     @fullscreen_ratio = get_option.call('FullscreenRatio', '0').to_i
     @windowed_ratio   = get_option.call('WindowedRatio'  , '1').to_i
-		#________________________________________________________________#
+    #________________________________________________________________#
     fullscreen? ? fullscreen_mode : windowed_mode
   end
 #|||||||||||||||||||||||||||||||||||||||||||#	
